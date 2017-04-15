@@ -1,0 +1,45 @@
+body {
+	background: #eaf2f8 ;
+	font-family: Georgia; 
+}
+
+table {
+    border-style: groove;
+    border-color: #800000;
+    border-collapse: collapse;
+    border-width: 5px;
+    width: 100%;
+}
+
+th, td {
+    text-align: center;
+    padding: 10px;
+    font-size: 110%;
+    border-color: #800000;
+    border-width: 3px;
+}
+
+tr:nth-child(even){background-color: #a3e4d7}
+tr:nth-child(odd){background-color: #48c9b0}
+
+
+th {
+    background-color:  #c0392b  ;
+    color: white;
+    font-size: 120%;
+    
+}
+
+input[type="button"]{
+    background-color:  #117864;
+    border: 4px solid #c0392b;
+    color: white;
+    padding: 15px 30px;
+    text-align: center;
+    display: inline-block;
+    font-size: 25px;
+    font-weight: bold;
+    border-radius: 15px;
+    width: 24%;
+}
+
