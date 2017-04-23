@@ -25,8 +25,7 @@ $(document).ready(function () {
 				function (data) {
 					alert(data);
 					$("#ref").trigger("click");
-				}
-                        )
+				});
 		} else {
 			alert("No row(s) selected")
 		}
@@ -35,12 +34,46 @@ $(document).ready(function () {
 	$("#d1").datepicker();
 	// edit form 
 	function save() {
+		// check fields
+		var loc = {table: "pdata"};
+		var fields = ["id", "easting", "northing"];
+		var opts = ["elev", "d1"];
+		for (i = 0; i < fields.length; i++) {
+			loc[fields[i]] = $("#"+fields[i]).val().trim();
+			if (loc[fields[i]].length == 0) {
+				alert(fields[i] + " is empty");
+				return;
+			}
+		}
+		for (i = 0; i < opts.length; i++) {
+			var w = $("#"+fields[i]).val().trim();
+			if (w.length == 0 && dialog.mode == "upd") {
+				alert(opts[i] + " is empty");
+				return;
+			}
+			loc[opts[i]] = w;
+		}
+		if (dialog.mode == "ins") {
+			$.ajax({url: path + "dbins",
+				data: loc}).done(
+				function (data) {
+					alert(data);
+					$("#ref").trigger("click");
+				});
+		}	
+		dialog.dialog("close");
 	}
 	dialog = $("#dia").dialog({autoOpen: false, modal: true,
-		buttons: { "Save": save,
-		Cancel: function () { dialog.dialog("close");}}
+		buttons: { Save: save,
+			Cancel: function () { dialog.dialog("close");}
+		}
+	});
+	$("#ins").click(function () {
+		dialog.mode = "ins";
+		dialog.dialog("open");
 	});
 	$("#upd").click(function () {
+		dialog.mode = "upd";
 		dialog.dialog("open");
 	});
 });
