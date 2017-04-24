@@ -19,7 +19,7 @@ def index(req, table="pdata", order="id"):
             <meta charset="UTF-8">
             <title> Table list </title>
             <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-            <link href="/dbtable/dbtable.css" rel="stylesheet"  type="text/css"/>
+            <link href="{2}" rel="stylesheet"  type="text/css"/>
             <script type="text/javascript" src="http://code.jquery.com/jquery-3.2.1.min.js" >
             </script>
             <script type="text/javascript" src="http://code.jquery.com/ui/1.12.1/jquery-ui.min.js">
@@ -50,7 +50,7 @@ def index(req, table="pdata", order="id"):
                <input type="button" name="del" value="Delete" id="del">&nbsp;
                <input type="button" name="ins" value="Insert" id="ins">&nbsp;
             </p><div id="dbtable">
-        """.format(config.path, config.js)
+        """.format(config.path, config.js, config.css)
     return res + dbtable(req, table, order) + "</div></body></html>"
 
 def dbtable(req, table, order="id"):
@@ -139,9 +139,9 @@ def dbins(req, table, id, easting, northing, elev=None, d=None):
         elev = 'NULL'
     if d is None:
         d = datetime.datetime.now().isoformat(" ")
-    sql = """insert into {0} (id, easting, northing, elev, d) 
+    sql = """insert into {0} (id, easting, northing, elev, d)
         values ('{1}', {2}, {3}, {4}, '{5}')
-        """.format(table, id, easting, northing, elev, d) 
+        """.format(table, id, easting, northing, elev, d)
     logging.debug(sql)
     cur = conn.cursor()
     cur.execute(sql)
