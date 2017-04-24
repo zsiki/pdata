@@ -1,3 +1,4 @@
 *.pyc
 dbtable.log
-config.py # config file mindig módusul + nem ugyanaz minden gépen
+config.py
+
