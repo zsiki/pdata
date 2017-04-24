@@ -107,7 +107,8 @@ def dbdel(req, table, ids):
     keys = ids.strip(";").split(";")
     for key in keys:
         i, d = key.split("|")
-        sql += "('{0}', '{1}')".format(i, d)
+        sql += "('{0}', '{1}'),".format(i, d)
+    sql = sql.strip(',')
     sql += ")"
     logging.debug(sql)
     cur = conn.cursor()
