@@ -64,6 +64,7 @@ $(document).ready(function () {
 					loc[opts[i]] = w;
 				}		
 			}
+			// check timformat
 			if (dialog.mode == "ins"){
 				var value = w
 				var matches = value.match (/([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]/)
