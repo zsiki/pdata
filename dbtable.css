@@ -30,16 +30,17 @@ th {
     
 }
 
+p.buttonclass
 input[type="button"]{
     background-color:  #117864;
     border: 4px solid #c0392b;
     color: white;
-    padding: 15px 30px;
+    padding: 10px 10px;
     text-align: center;
     display: inline-block;
     font-size: 25px;
     font-weight: bold;
     border-radius: 15px;
-    width: 24%;
+    width: 19%;		/* this number shows each buttons width-size in % (100% is the full width of the display) */
+    min-width: 125px;
 }
-

@@ -41,14 +41,18 @@ def index(req, table="pdata", order="id"):
                     <label for="elev">Elevation</label><br />
                     <input type="text" name="elev" id="elev" size="15"><br />
                     <label for="d1">Date</label><br />
-                    <input type="text" name="d1" id="d1" size="15">
+                    <input type="text" name="d1" id="d1" size="15"><br />
+                    <label for="d2">Time</label><br />
+                    <input type="text" name="d2" id="d2" size="15">
+
                     </fieldset>
                 </form>
             </div>
-            <p><input type="button" name="ref" value="Refresh" id="ref">&nbsp;
+            <p class="buttonclass"><input type="button" name="ref" value="Refresh" id="ref">&nbsp;
                <input type="button" name="upd" value="Update" id="upd">&nbsp;
                <input type="button" name="del" value="Delete" id="del">&nbsp;
                <input type="button" name="ins" value="Insert" id="ins">&nbsp;
+	       <input type="button" name="sel" value="Select" id="sel">&nbsp;
             </p><div id="dbtable">
         """.format(config.path, config.js, config.css)
     return res + dbtable(req, table, order) + "</div></body></html>"
