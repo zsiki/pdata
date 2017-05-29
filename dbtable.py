@@ -4,6 +4,7 @@
 import logging
 import datetime
 import psycopg2
+import json
 import config     # some configuration settings (database, js)
 
 def index(req, table="pdata", order="id"):
@@ -123,6 +124,24 @@ def dbdel(req, table, ids):
     cur.close()
     return msg
 
+def test(id):
+    logging.basicConfig(format=config.log_format, filename=config.log)
+    conn = psycopg2.connect(database=config.database)
+    if not conn:
+        msg = "Cannot connect to database :("
+        logging.error(msg)
+        return msg
+
+    sql = "select id,easting,northing,elev from {0} where id='{1}'".format("pdata",id)
+    logging.debug(sql)
+    cur = conn.cursor()
+    cur.execute(sql)
+    result=json.dumps(cur.fetchall())
+
+    # hibakezeles!!!
+    cur.close()
+    return result
+
 def dbins(req, table, id, easting, northing, elev=None, d=None):
     """ Insert new record into table
         :param req: request object from apache
@@ -151,6 +170,41 @@ def dbins(req, table, id, easting, northing, elev=None, d=None):
     cur = conn.cursor()
     cur.execute(sql)
     msg = "{0} lines inserted".format(cur.rowcount)
+    logging.info(msg)
+    conn.commit()
+    cur.close()
+    return msg
+
+
+def dbupd(req, table, id, easting, northing, elev=None, d=None):
+    """ Insert new record into table
+        :param req: request object from apache
+        :param table: table name
+        :param id: point id
+        :param easting: easting coordinate
+        :param northing: northing coordinate
+        :param elev: elevation
+        :param d: data and time
+        :return: number of deleted rows
+    """
+    logging.basicConfig(format=config.log_format, filename=config.log)
+    conn = psycopg2.connect(database=config.database)
+    if not conn:
+        msg = "Cannot connect to database :("
+        logging.error(msg)
+        return msg
+    if elev is None:
+        elev = 'NULL'
+    if d is None:
+        d = datetime.datetime.now().isoformat(" ")
+    sql = """UPDATE {0} 
+            SET id='{1}', easting='{2}', northing='{3}', elev='{4}', d='{5}'
+            WHERE id='{1}';
+        """.format(table, id, easting, northing, elev, d)
+    logging.debug(sql)
+    cur = conn.cursor()
+    cur.execute(sql)
+    msg = "Line: '{0}' updated".format(id)
     logging.info(msg)
     conn.commit()
     cur.close()
