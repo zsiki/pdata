@@ -41,35 +41,39 @@ $(document).ready(function () {
 	});
 
 	var selectedId;
+	var selectedDate;
+	var selectedTime;
 
 	function updateDialogFill() {
-		var s = [];
-		$(":input:checkbox:checked").
-			each(function (ind, val) {
-				s.push(val.name);
-			});
-
+		var s = $(":input:checkbox:checked");
 		if (s.length == 1) {
-			selectedId = s[0].split('|')[0];
+			var w = s[0].name;	// point id and date time
+			var w1 = w.split('|');
+			var selectedId = w1[0];
+			var w2 = w1[1].split(' ');
+			selectedDate = w2[0];
+			selectedTime = w2[1];
 
-			var eredmeny;
-			$.post({url: path + "test", data:{ id: selectedId }},
-				function (data, status) {
-					eredmeny = JSON.parse(data);
-					//alert(eredmeny[0][1])
-					$("#id").val(eredmeny[0][0]);
-					$("#easting").val(eredmeny[0][1]);
-					$("#northing").val(eredmeny[0][2]);
-					$("#elev").val(eredmeny[0][3]);
-					$("#d1").val("");
-					$("#d2").val("");
-
+			$.ajax({
+				url: path + "test",
+				data: { table: "pdata", id: selectedId,
+					d: w1[1]}
+			}).done(
+				function (data) {
+					var res = JSON.parse(data);
+					$("#id").val(res[0]);
+					$("#easting").val(res[1]);
+					$("#northing").val(res[2]);
+					$("#elev").val(res[3] == 'None' ? '' : res[3]);
+					w = res[4].split(' ');
+					$("#d1").val(w[0]);
+					$("#d2").val(w[1]);
 				});
 		} else if (s.length > 1) {
-			alert("Too many rows selects")
+			alert("Too many rows selected")
 			dialog.dialog("close");
 		} else {
-			alert("No row selected")
+			alert("Select a row!")
 			dialog.dialog("close");
 		}
 	}

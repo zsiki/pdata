@@ -124,7 +124,7 @@ def dbdel(req, table, ids):
     cur.close()
     return msg
 
-def test(id):
+def test(req, table, id, d):
     logging.basicConfig(format=config.log_format, filename=config.log)
     conn = psycopg2.connect(database=config.database)
     if not conn:
@@ -132,11 +132,14 @@ def test(id):
         logging.error(msg)
         return msg
 
-    sql = "select id,easting,northing,elev from {0} where id='{1}'".format("pdata",id)
+    sql = "select id,easting,northing,elev,d from {0} where id='{1}' and d = '{2}'".format(table, id, d)
     logging.debug(sql)
     cur = conn.cursor()
     cur.execute(sql)
-    result=json.dumps(cur.fetchall())
+    if cur.rowcount == 1:
+        result = json.dumps(['{}'.format(x) for x in cur.fetchone()])
+    else:
+        result = []
 
     # hibakezeles!!!
     cur.close()
