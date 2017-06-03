@@ -62,8 +62,8 @@ $(document).ready(function () {
 				function (data) {
 					var res = JSON.parse(data);
 					$("#id").val(res[0]);
-					$("#easting").val(res[1]);
-					$("#northing").val(res[2]);
+					$("#easting").val(res[1] == 'None' ? '' : res[1]);
+					$("#northing").val(res[2] == 'None' ? '' : res[2]);
 					$("#elev").val(res[3] == 'None' ? '' : res[3]);
 					w = res[4].split(' ');
 					$("#d1").val(w[0]);
