@@ -105,12 +105,12 @@ $(document).ready(function () {
 					loc[opts[i]] = w;
 				}
 			}
-			// check timformat
+			// check timeformat
 			if (dialog.mode == "ins") {
 				var value = w
 				var matches = value.match(/([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]/)
 				if (matches == null) {
-					alert("Not good time-format!");
+					alert("Invalid time format!");
 					return;
 				}
 			}
@@ -140,15 +140,55 @@ $(document).ready(function () {
 						$("#ref").trigger("click");
 					});
 			}
+
 		}
 		dialog.dialog("close");
 	}
+
+	// Data filter dialog save function.
+	function filtSave () {
+		// Send the dialog data to the dbfilt function.
+		$.ajax({
+			url: path + "dbfilt",
+			data: {
+				table: "pdata",
+				id: $("#filtId").val(),
+				minEasting: $("#filtMinEasting").val(),
+				maxEasting: $("#filtMaxEasting").val(),
+				minNorthing: $("#filtMinNorthing").val(),
+				maxNorthing: $("#filtMaxNorthing").val(),
+				minElev: $("#filtMinElev").val(),
+				maxElev: $("#filtMaxElev").val(),
+				minD: $("#filtMinD").val(),
+				maxD: $("#filtMaxD").val()
+			}
+		}).done(
+			function (data) {
+				// Parse the returned JSON.
+				var res = JSON.parse(data)
+				// filtHTML contains the HTML code of the filtered rows.
+				$("#dbtable").html(res.filtHTML)
+				// The number of returned rows is alerted to the user.
+				alert(res.rcount);
+			});
+		// Close the dialog box.
+		filtDialog.dialog("close");
+	};
 
 	dialog = $("#dia").dialog({
 		autoOpen: false, modal: true,
 		buttons: {
 			Save: save,
 			Cancel: function () { dialog.dialog("close"); }
+		}
+	});
+
+	// Create data filter dialog.
+	filtDialog = $("#filtDia").dialog({
+		autoOpen: false, modal: true, width: "auto",
+		buttons: {
+			Valami: filtSave,
+			Cancel: function () { filtDialog.dialog("close"); }
 		}
 	});
 
@@ -167,5 +207,10 @@ $(document).ready(function () {
 	$("#sel").click(function () {
 		dialog.mode = "sel";
 		dialog.dialog("open");
+	});
+
+	// Open the data filter dialog if the "filter" button is pressed.
+	$("#filt").click(function () {
+		filtDialog.dialog("open");
 	});
 });
