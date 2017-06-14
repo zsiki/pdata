@@ -41,6 +41,6 @@ input[type="button"]{
     font-size: 25px;
     font-weight: bold;
     border-radius: 15px;
-    width: 19%;		/* this number shows each buttons width-size in % (100% is the full width of the display) */
+    width: 16%;		/* this number shows each buttons width-size in % (100% is the full width of the display) */
     min-width: 125px;
 }
