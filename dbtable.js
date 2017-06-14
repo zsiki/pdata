@@ -63,7 +63,7 @@ $(document).ready(function () {
 					var res = JSON.parse(data);
 					$("#id").val(res[0]);
 					$("#easting").val(res[1] == 'None' ? '' : res[1]);
-					$("#northing").val(res[2] == 'None' ? '' : res[2]);
+					$("#Elev").val(res[2] == 'None' ? '' : res[2]);
 					$("#elev").val(res[3] == 'None' ? '' : res[3]);
 					w = res[4].split(' ');
 					$("#d1").val(w[0]);
@@ -82,7 +82,7 @@ $(document).ready(function () {
 	function save() {
 		// check fields
 		var loc = { table: "pdata" };
-		var fields = ["id", "easting", "northing"];
+		var fields = ["id", "easting", "Elev"];
 		var opts = ["elev", "d1", "d2"];
 		if (dialog.mode == "ins" || dialog.mode == "upd") {
 			for (i = 0; i < fields.length; i++) {
@@ -147,32 +147,65 @@ $(document).ready(function () {
 
 	// Data filter dialog save function.
 	function filtSave () {
-		// Send the dialog data to the dbfilt function.
-		$.ajax({
-			url: path + "dbfilt",
-			data: {
-				table: "pdata",
-				id: $("#filtId").val(),
-				minEasting: $("#filtMinEasting").val(),
-				maxEasting: $("#filtMaxEasting").val(),
-				minNorthing: $("#filtMinNorthing").val(),
-				maxNorthing: $("#filtMaxNorthing").val(),
-				minElev: $("#filtMinElev").val(),
-				maxElev: $("#filtMaxElev").val(),
-				minD: $("#filtMinD").val(),
-				maxD: $("#filtMaxD").val()
-			}
-		}).done(
-			function (data) {
-				// Parse the returned JSON.
-				var res = JSON.parse(data)
-				// filtHTML contains the HTML code of the filtered rows.
-				$("#dbtable").html(res.filtHTML)
-				// The number of returned rows is alerted to the user.
-				alert(res.rcount);
-			});
-		// Close the dialog box.
-		filtDialog.dialog("close");
+		// Match the given date against the accepted format (empty or full date).
+		var minD = $("#filtMinD").val();
+		var maxD = $("#filtMaxD").val();
+		var dateMatch = minD.match(/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}$|^$/) &&
+						maxD.match(/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}$|^$/);
+						
+		// Match the coordinates and the elevations against the accepted format.
+		var minEasting = $("#filtMinEasting").val();
+		var maxEasting = $("#filtMaxEasting").val();
+		var eastingMatch = minEasting.match(/^[0-9]+\.?[0-9]*$|^$/) &&
+						   maxEasting.match(/^[0-9]+\.?[0-9]*$|^$/);
+
+		var minNorthing = $("#filtMinNorthing").val();
+		var maxNorthing = $("#filtMaxNorthing").val();
+		var northingMatch = minNorthing.match(/^[0-9]+\.?[0-9]*$|^$/) &&
+						    maxNorthing.match(/^[0-9]+\.?[0-9]*$|^$/);
+
+		var minElev = $("#filtMinElev").val();
+		var maxElev = $("#filtMaxElev").val();
+		var elevMatch = minElev.match(/^[0-9]+\.?[0-9]*$|^$/) &&
+						maxElev.match(/^[0-9]+\.?[0-9]*$|^$/);
+		
+		// Check the matches.
+		if (dateMatch == null) {
+			alert("Invalid date format!");
+		} else if (eastingMatch == null) {
+			alert("Invalid Easting format!");
+		} else if (northingMatch == null) {
+			alert("Invalid Northing format!");
+		} else if (elevMatch == null) {
+			alert("Invalid Elevation format!");
+		} else {
+			$.ajax({
+				url: path + "dbfilt",
+				data: {
+					table: "pdata",
+					id: $("#filtId").val(),
+					minEasting: $("#filtMinEasting").val(),
+					maxEasting: $("#filtMaxEasting").val(),
+					minNorthing: $("#filtMinNorthing").val(),
+					maxNorthing: $("#filtMaxNorthing").val(),
+					minElev: $("#filtMinElev").val(),
+					maxElev: $("#filtMaxElev").val(),
+					minD: $("#filtMinD").val(),
+					maxD: $("#filtMaxD").val()
+				}
+			}).done(
+				function (data) {
+					// Parse the returned JSON.
+					var res = JSON.parse(data)
+					// filtHTML contains the HTML code of the filtered rows.
+					$("#dbtable").html(res.filtHTML)
+					// The number of returned rows is alerted to the user.
+					alert(res.rcount);
+				});
+			
+				// Close the dialog box.
+				filtDialog.dialog("close");
+		};
 	};
 
 	dialog = $("#dia").dialog({
