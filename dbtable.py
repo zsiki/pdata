@@ -131,7 +131,7 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
              <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Elevation</th><th>Time</th></tr>
         """
     for row in cur:
-        res += """<tr><td><input type="checkbox" name="{0}|{3}"></td>
+        res += """<tr><td><input type="checkbox" name="{0}|{4}"></td>
                <td>{0}</td><td>{1}</td>
                <td>{2}</td>
                <td>{3}</td>
