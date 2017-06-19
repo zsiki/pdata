@@ -2,6 +2,7 @@
     Python module to handle temporal point data
 """
 import logging
+import re
 import datetime
 import psycopg2
 import json
@@ -49,32 +50,6 @@ def index(req, table="pdata", order="id"):
                 </form>
             </div>
 
-            <!-- Dialog box for data filtering --!>
-            <div id="filtDia" title="Data filtering">
-                <form>
-                    <fieldset>
-                    <p>RegEx can be used for ID filtering.</p>
-                    <label for="id">Point ID</label>&nbsp;
-                    <input type="text" name="minId" id="filtId" size="15"><br />
-                    <label for="minEasting">Min. Easting</label>&nbsp;
-                    <input type="text" name="minEasting" id="filtMinEasting" size="15">&nbsp;
-                    <label for="maxEasting">Max. Easting</label>&nbsp;
-                    <input type="text" name="maxEasting" id="filtMaxEasting" size="15"><br />
-                    <label for="minNorthing">Min. Northing</label>&nbsp;
-                    <input type="text" name="minNorthing" id="filtMinNorthing" size="15">&nbsp;
-                    <label for="maxNorthing">Max. Northing</label>&nbsp;
-                    <input type="text" name="maxNorthing" id="filtMaxNorthing" size="15"><br />
-                    <label for="minElev">Min. Elevation</label>&nbsp;
-                    <input type="text" name="minElev" id="filtMinElev" size="15">&nbsp;
-                    <label for="maxElev">Max. Elevation</label>&nbsp;
-                    <input type="text" name="maxElev" id="filtMaxElev" size="15"><br />
-                    <label for="d">Earliest Date</label>&nbsp;
-                    <input type="text" name="minD" id="filtMinD" size="15">&nbsp;
-                    <label for="d">Latest Date</label>&nbsp;
-                    <input type="text" name="maxD" id="filtMaxD" size="15">&nbsp;                    </fieldset>
-                </form>
-            </div>
-
             <p class="buttonclass"><input type="button" name="ref" value="Refresh" id="ref">&nbsp;
                <input type="button" name="upd" value="Update" id="upd">&nbsp;
                <input type="button" name="del" value="Delete" id="del">&nbsp;
@@ -85,12 +60,19 @@ def index(req, table="pdata", order="id"):
         """.format(config.path, config.js, config.css)
     return res + dbtable(req, table, order) + "</div></body></html>"
 
-def dbtable(req, table, order="id"):
+def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', elevFilt='', 
+            d1Filt = '', d2Filt = ''):
     """ returns html table of point data from database
 
         :param req: request data (not used)
         :param table: table name in database
         :param order: sort order of table data
+        :param idFilt: filter to query the point id's
+        :param eastingFilt: filter for the easting coords
+        :param northingFilt: filter for the northing coords
+        :param elevFilt: filter for the elevations
+        :param d1Filt: first part (year-month-day) of the date filter
+        :param d2Filt: second part (hour-minute_second) of the date filter 
         :returns: html string
     """
     logging.basicConfig(format=config.log_format, filename=config.log)
@@ -100,7 +82,43 @@ def dbtable(req, table, order="id"):
         logging.error(msg)
         return msg
 
-    sql = "select * from {0}".format(table)
+    sql = "select * from {0} ".format(table)
+
+    query = ""
+    # Filtering the database.
+    if idFilt != "" or eastingFilt != "" or northingFilt != "" or elevFilt != "" or d1Filt != "" or d2Filt != "":
+        query += "where "
+
+    # Point ID filter
+    if idFilt != "":
+        query += "id ~ '{0}' and ".format(idFilt)
+
+    # Easting filter
+    if eastingFilt != "":
+        query += "easting {0} and ".format(eastingFilt)
+
+    # Northing filter
+    if northingFilt != "":
+        query += "northing {0} and ".format(northingFilt)
+
+    # Elevation filter
+    if elevFilt != "":
+        query += "elev {0} and ".format(elevFilt)
+
+    # Year-Month-Day filter
+    if d1Filt != "":
+        d1FiltMod = re.subn(r'(\d{4}\-\d{2}\-\d{2})', r"'\1'", d1Filt)[0]
+        query += "to_char(d, 'YYYY-MM-DD') {0} and ".format(d1FiltMod)
+
+    # Hour-Minute-Second filter
+    if d2Filt != "":
+        d2FiltMod = re.subn(r'(\d{2}\:\d{2}\:\d{2})', r"'\1'", d2Filt)[0]
+        query += "to_char(d, 'HH24:MI:SS') {0}".format(d2FiltMod)
+
+    # Strip the ending 'and' of the SQL and close it
+    query = query.strip(" and ")
+    sql += query
+
     if order is not None and len(order.strip()):
         sql += " order by {0}".format(order)
     logging.debug(sql)
@@ -110,13 +128,14 @@ def dbtable(req, table, order="id"):
 
     res = """
              <table border="1">
-             <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Time</th></tr>
+             <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Elevation</th><th>Time</th></tr>
         """
     for row in cur:
         res += """<tr><td><input type="checkbox" name="{0}|{3}"></td>
                <td>{0}</td><td>{1}</td>
                <td>{2}</td>
-               <td>{3}</td></tr>""".format(row[0], row[1], row[2], row[4])
+               <td>{3}</td>
+               <td>{4}</td></tr>""".format(row[0], row[1], row[2], row[3], row[4])
     res += "</table>"
     cur.close()
     return res
@@ -239,78 +258,3 @@ def dbupd(req, table, id, easting, northing, elev=None, d=None):
     conn.commit()
     cur.close()
     return msg
-    
-# Data filter function for the database backend.
-def dbfilt(req, table, id="", minEasting=-1e10, maxEasting=1e10, 
-           minNorthing=-1e10, maxNorthing=1e10, minElev=-1e10, maxElev=1e10, 
-           minD='1900-01-01 00:00:00', maxD='2200-12-31 24:00:00'):
-    """ Filter database table with the given paramters.
-        :param req: request object from apache
-        :param table: table name
-        :param id: filtering condition for point ID
-        :param maxEasting: maximum threshold for easting coordinates
-        :param minEasting: minimum threshold for easting coordinates
-        :param maxNorthing: maximum threshold for northing coordinates
-        :param minNorthing: minimum threshold for northing coordinates
-        :param minElev: minimum threshold for elevations
-        :param maxElev: maximum threshold for elevations 
-        :param minD: starting date
-        :param maxD: ending date
-        :return res: HTML code containing the rows that satisfy the conditions
-        :return rcount: number of rows satisfying the condition
-    """
-
-    # Check if arguments are empty and change them to the default settings.
-    if minEasting == "": minEasting = -1e10
-    if maxEasting == "": maxEasting = 1e10
-    if minNorthing == "": minNorthing = -1e10
-    if maxNorthing == "": maxNorthing = 1e10
-    if minElev == "": minElev = -1e10
-    if maxElev == "": maxElev = 1e10
-    if minD == "": minD = '1900-01-01 00:00:00'
-    if maxD == "": maxD = '2200-12-31 24:00:00' 
-
-    logging.basicConfig(format=config.log_format, filename=config.log)
-    conn = psycopg2.connect(database=config.database)
-    
-    # On connection error.
-    if not conn:
-        msg = "Cannot connect to database."
-        logging.error(msg)
-        return msg
-
-    # Create cursor.
-    cur = conn.cursor()
-
-    # Create SQL with the specified filtering conditions.
-    sql = "select * from {0} where id ~ '{1}' and "\
-          "easting between {2} and {3} and northing between {4} and {5} and "\
-          "elev between {6} and {7} and d between '{8}' and '{9}';".format(table, id, 
-            minEasting, maxEasting, minNorthing, maxNorthing, minElev, maxElev, minD, maxD)
-
-    # Execute SQL query.
-    cur.execute(sql)
-
-    # Create HTML for each row.
-    res = """
-         <table border="1">
-         <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Time</th></tr>
-    """
-    for row in cur:
-        res += """<tr><td><input type="checkbox" name="{0}|{3}"></td>
-               <td>{0}</td><td>{1}</td>
-               <td>{2}</td>
-               <td>{3}</td></tr>""".format(row[0], row[1], row[2], row[4])
-    res += "</table>"
-
-    # Number of rows in the query return.
-    rcount = cur.rowcount
-
-    # Close cursor and connection.
-    cur.close(), conn.close()
-
-    # Create JSON from the results
-    filtData = json.dumps({"filtHTML": res, 
-                           "rcount": "{0} row(s) matched the filter.".format(rcount)})
-
-    return filtData
