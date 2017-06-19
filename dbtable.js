@@ -66,6 +66,9 @@ $(document).ready(function () {
 	var d2F = "";
 
 	function updateDialogFill() {
+		// Selected checkboxes.
+		s = $(":input:checkbox:checked");
+
 		// Filter mode for dialog box.
 		if (dialog.mode == "filt") {
 			// Getting the previous filter entries.
@@ -76,21 +79,6 @@ $(document).ready(function () {
 			$("#d1").val(d1F);
 			$("#d2").val(d2F);
 
-			$.ajax({
-				url: path + "test",
-				data: { table: "pdata", id: selectedId,
-					d: w1[1]}
-			}).done(
-				function (data) {
-					var res = JSON.parse(data);
-					$("#id").val(res[0]);
-					$("#easting").val(res[1] == 'None' ? '' : res[1]);
-					$("#northing").val(res[2] == 'None' ? '' : res[2]);
-					$("#elev").val(res[3] == 'None' ? '' : res[3]);
-					w = res[4].split(' ');
-					$("#d1").val(w[0]);
-					$("#d2").val(w[1]);
-				});
 		} else if (s.length > 1) {
 			alert("Too many rows selected")
 			dialog.dialog("close");
