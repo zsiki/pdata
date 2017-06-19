@@ -116,6 +116,7 @@ $(document).ready(function () {
 				dialog.dialog("close");
 			}
 		}
+		return[selectedDate, selectedId, selectedTime];
 	}
 
 	// edit form 
@@ -164,7 +165,7 @@ $(document).ready(function () {
 				loc[fields[i]] = $("#" + fields[i]).val().trim();
 				if (loc[fields[i]].length == 0) {
 					alert(fields[i] + " is empty");
-					return;
+					return loc;
 				}
 			}
 			for (i = 0; i < opts.length; i++) {
@@ -205,7 +206,6 @@ $(document).ready(function () {
 			}
 
 			if (dialog.mode == "upd") {
-				loc["id"] = selectedId;
 				$.ajax({
 					url: path + "dbupd",
 					data: loc
