@@ -6,11 +6,23 @@ $(document).ready(function () {
 	$("#ref").click(function () {
 		$.ajax({
 			url: path + "dbtable",
-			data: { table: "pdata" }
+			data: { 
+				table: "pdata",
+				idFilt: idF,
+				eastingFilt: eastingF,
+				northingFilt: northingF,
+				elevFilt: elevF,
+				d1Filt: d1F,
+				d2Filt: d2F 
+			}
 		}).done(
 			function (data) {
 				$("#dbtable").html(data);
-				alert("refreshed");
+				if (dialog.mode == "filt") {
+					alert("Database filtered!")
+				} else {
+					alert("Database refreshed!");					
+				};
 			});
 	});
 	// delete marked records
@@ -35,54 +47,109 @@ $(document).ready(function () {
 		}
 	});
 
-	// datepicker
+	//datepicker
 	$(function () {
-		$("#d1").datepicker({ dateFormat: 'yy-mm-dd' });
+		$("#d1").datepicker({ dateFormat: 'yy-mm-dd',
+							  constrainInput: false });
 	});
 
 	var selectedId;
 	var selectedDate;
 	var selectedTime;
 
-	function updateDialogFill() {
-		var s = $(":input:checkbox:checked");
-		if (s.length == 1) {
-			var w = s[0].name;	// point id and date time
-			var w1 = w.split('|');
-			var selectedId = w1[0];
-			var w2 = w1[1].split(' ');
-			selectedDate = w2[0];
-			selectedTime = w2[1];
+	// Initialize filter dialog box variables.
+	var idF = "";
+	var eastingF = "";
+	var northingF = "";
+	var elevF = "";
+	var d1F = "";
+	var d2F = "";
 
-			$.ajax({
-				url: path + "test",
-				data: { table: "pdata", id: selectedId,
-					d: w1[1]}
-			}).done(
-				function (data) {
-					var res = JSON.parse(data);
-					$("#id").val(res[0]);
-					$("#easting").val(res[1] == 'None' ? '' : res[1]);
-					$("#Elev").val(res[2] == 'None' ? '' : res[2]);
-					$("#elev").val(res[3] == 'None' ? '' : res[3]);
-					w = res[4].split(' ');
-					$("#d1").val(w[0]);
-					$("#d2").val(w[1]);
-				});
-		} else if (s.length > 1) {
-			alert("Too many rows selected")
-			dialog.dialog("close");
+	function updateDialogFill() {
+		// Filter mode for dialog box.
+		if (dialog.mode == "filt") {
+			// Getting the previous filter entries.
+			$("#id").val(idF);
+			$("#easting").val(eastingF);
+			$("#northing").val(northingF);
+			$("#elev").val(elevF);
+			$("#d1").val(d1F);
+			$("#d2").val(d2F);
 		} else {
-			alert("Select a row!")
-			dialog.dialog("close");
+			var s = $(":input:checkbox:checked");
+			if (s.length == 1) {
+				var w = s[0].name;	// point id and date time
+				var w1 = w.split('|');
+				var selectedId = w1[0];
+				var w2 = w1[1].split(' ');
+				selectedDate = w2[0];
+				selectedTime = w2[1];
+
+				$.ajax({
+					url: path + "test",
+					data: { table: "pdata", id: selectedId,
+						d: w1[1]}
+				}).done(
+					function (data) {
+						var res = JSON.parse(data);
+						$("#id").val(res[0]);
+						$("#easting").val(res[1] == 'None' ? '' : res[1]);
+						$("#northing").val(res[2] == 'None' ? '' : res[2]);
+						$("#elev").val(res[3] == 'None' ? '' : res[3]);
+						w = res[4].split(' ');
+						$("#d1").val(w[0]);
+						$("#d2").val(w[1]);
+					});
+			} else if (s.length > 1) {
+				alert("Too many rows selected")
+				dialog.dialog("close");
+			} else {
+				alert("Select a row!")
+				dialog.dialog("close");
+			}
 		}
 	}
 
 	// edit form 
 	function save() {
+		// Filter option for the dialog box.
+		if (dialog.mode == "filt") {
+			// Get the values from the filter dialog box.
+			idF = $("#id").val();
+			eastingF = $("#easting").val();
+			northingF = $("#northing").val();
+			elevF = $("#elev").val();
+			d1F = $("#d1").val();
+			d2F = $("#d2").val();
+
+			// Validate the field values.
+			// Easting, Northing and Elevation validation:
+			if (coordValid(eastingF) == 0) {
+				alert("Easting filter invalid!");
+				dialog.dialog("close");
+				return;
+			};
+
+			if (coordValid(northingF) == 0) {
+				alert("Northing filter invalid!");
+				dialog.dialog("close");
+				return;
+			};
+
+			// D1 validation (year-month-day):
+			if (dateValid(d1F) == 0) {
+				alert("Invalid date function!")
+				dialog.dialog("close");
+				return;
+			};
+
+			// Trigger the refresh button with the filter settings.
+			$("#ref").trigger("click");
+		};
+
 		// check fields
 		var loc = { table: "pdata" };
-		var fields = ["id", "easting", "Elev"];
+		var fields = ["id", "easting", "northing"];
 		var opts = ["elev", "d1", "d2"];
 		if (dialog.mode == "ins" || dialog.mode == "upd") {
 			for (i = 0; i < fields.length; i++) {
@@ -139,72 +206,38 @@ $(document).ready(function () {
 						alert(data);
 						$("#ref").trigger("click");
 					});
-			}
+			};
 
-		}
+		};
+
 		dialog.dialog("close");
-	}
+	};
 
-	// Data filter dialog save function.
-	function filtSave () {
-		// Match the given date against the accepted format (empty or full date).
-		var minD = $("#filtMinD").val();
-		var maxD = $("#filtMaxD").val();
-		var dateMatch = minD.match(/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}$|^$/) &&
-						maxD.match(/^[0-9]{4}\-[0-9]{2}\-[0-9]{2}\ [0-9]{2}\:[0-9]{2}\:[0-9]{2}$|^$/);
-						
-		// Match the coordinates and the elevations against the accepted format.
-		var minEasting = $("#filtMinEasting").val();
-		var maxEasting = $("#filtMaxEasting").val();
-		var eastingMatch = minEasting.match(/^[0-9]+\.?[0-9]*$|^$/) &&
-						   maxEasting.match(/^[0-9]+\.?[0-9]*$|^$/);
+	// Validity checker for the coordinate fields.
+	function coordValid(coord) {
+		matches = /^(<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)$/.test(coord) +
+				  /^(<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)\ (and|or)\ (<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)$/.test(coord) +
+				  /^between\ (\-?\d+\.?\d*|\.\d+)\ and\ (\-?\d+\.?\d*|\.\d+)$/.test(coord) +
+				  /^$/.test(coord);
 
-		var minNorthing = $("#filtMinNorthing").val();
-		var maxNorthing = $("#filtMaxNorthing").val();
-		var northingMatch = minNorthing.match(/^[0-9]+\.?[0-9]*$|^$/) &&
-						    maxNorthing.match(/^[0-9]+\.?[0-9]*$|^$/);
-
-		var minElev = $("#filtMinElev").val();
-		var maxElev = $("#filtMaxElev").val();
-		var elevMatch = minElev.match(/^[0-9]+\.?[0-9]*$|^$/) &&
-						maxElev.match(/^[0-9]+\.?[0-9]*$|^$/);
-		
-		// Check the matches.
-		if (dateMatch == null) {
-			alert("Invalid date format!");
-		} else if (eastingMatch == null) {
-			alert("Invalid Easting format!");
-		} else if (northingMatch == null) {
-			alert("Invalid Northing format!");
-		} else if (elevMatch == null) {
-			alert("Invalid Elevation format!");
+		if (matches == 0) {
+			return(0);
 		} else {
-			$.ajax({
-				url: path + "dbfilt",
-				data: {
-					table: "pdata",
-					id: $("#filtId").val(),
-					minEasting: $("#filtMinEasting").val(),
-					maxEasting: $("#filtMaxEasting").val(),
-					minNorthing: $("#filtMinNorthing").val(),
-					maxNorthing: $("#filtMaxNorthing").val(),
-					minElev: $("#filtMinElev").val(),
-					maxElev: $("#filtMaxElev").val(),
-					minD: $("#filtMinD").val(),
-					maxD: $("#filtMaxD").val()
-				}
-			}).done(
-				function (data) {
-					// Parse the returned JSON.
-					var res = JSON.parse(data)
-					// filtHTML contains the HTML code of the filtered rows.
-					$("#dbtable").html(res.filtHTML)
-					// The number of returned rows is alerted to the user.
-					alert(res.rcount);
-				});
-			
-				// Close the dialog box.
-				filtDialog.dialog("close");
+			return(1);
+		};
+	};
+
+	// Validity checker for the date field.
+	function dateValid(d1) {
+		matches = /^(<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}$/.test(d1) +
+				  /^(<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}$/.test(d1) +
+				  /^between\ \d{4}\-\d{2}\-\d{2}\ and\ \d{4}\-\d{2}\-\d{2}$/.test(d1) +
+				  /^$/.test(d1);
+	
+		if (matches == 0) {
+			return(0);
+		} else {
+			return(1);
 		};
 	};
 
@@ -213,15 +246,6 @@ $(document).ready(function () {
 		buttons: {
 			Save: save,
 			Cancel: function () { dialog.dialog("close"); }
-		}
-	});
-
-	// Create data filter dialog.
-	filtDialog = $("#filtDia").dialog({
-		autoOpen: false, modal: true, width: "auto",
-		buttons: {
-			Valami: filtSave,
-			Cancel: function () { filtDialog.dialog("close"); }
 		}
 	});
 
@@ -244,6 +268,8 @@ $(document).ready(function () {
 
 	// Open the data filter dialog if the "filter" button is pressed.
 	$("#filt").click(function () {
-		filtDialog.dialog("open");
+		dialog.mode = "filt";
+		dialog.dialog("open");
 	});
+
 });
