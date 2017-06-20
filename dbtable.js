@@ -79,6 +79,12 @@ $(document).ready(function () {
 			$("#d1").val(d1F);
 			$("#d2").val(d2F);
 
+			// Show filtering options to the user.
+			$("#filtMessage").html("<p style='margin-bottom:8px'>RegEx can be used to filter the point ID's.</p>" +
+								   "<p style='margin-top:0;margin-bottom:8px'>Valid operators for the easting, northing, elevation, date and hour filtering: " +
+								   "<, >, =, <=, >=, and, or, between x and y.</p>" +
+								   "<p style='margin-top:0'>Example: < 2017-02-02 and >= 2017-01-03</p>")
+
 		} else if (s.length > 1) {
 			alert("Too many rows selected")
 			dialog.dialog("close");
@@ -135,20 +141,28 @@ $(document).ready(function () {
 			// Easting, Northing and Elevation validation:
 			if (coordValid(eastingF) == 0) {
 				alert("Easting filter invalid!");
-				dialog.dialog("close");
 				return;
 			};
 
 			if (coordValid(northingF) == 0) {
 				alert("Northing filter invalid!");
-				dialog.dialog("close");
+				return;
+			};
+
+			if (coordValid(elevF) == 0) {
+				alert("Elevation filter invalid!");
 				return;
 			};
 
 			// D1 validation (year-month-day):
 			if (dateValid(d1F) == 0) {
-				alert("Invalid date function!")
-				dialog.dialog("close");
+				alert("Date filter invalid!")
+				return;
+			};
+
+			//D2 validation (hour-minute-second):
+			if (hmsValid(d2F) == 0) {
+				alert("Hour:Minute:Second filter invalid!");
 				return;
 			};
 
@@ -242,6 +256,20 @@ $(document).ready(function () {
 				  /^between\ \d{4}\-\d{2}\-\d{2}\ and\ \d{4}\-\d{2}\-\d{2}$/.test(d1) +
 				  /^$/.test(d1);
 	
+		if (matches == 0) {
+			return(0);
+		} else {
+			return(1);
+		};
+	};
+
+	// Validity checker for the hour-minute-second field.
+	function hmsValid(d2) {
+		matches = /^(<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}$/.test(d2) +
+				  /^(<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}$/.test(d2) +
+				  /^between\ \d{2}\:\d{2}\:\d{2}\ and\ \d{2}\:\d{2}\:\d{2}$/.test(d2) +
+				  /^$/.test(d2);
+
 		if (matches == 0) {
 			return(0);
 		} else {
