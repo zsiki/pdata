@@ -71,6 +71,9 @@ $(document).ready(function () {
 	var d2F = "";
 
 	function updateDialogFill() {
+		// Reset the dialog box text.
+		$("#filtMessage").html("");
+
 		// Selected checkboxes.
 		s = $(":input:checkbox:checked");
 
@@ -128,7 +131,8 @@ $(document).ready(function () {
 			}
 		}
 		return[selectedDate, selectedId, selectedTime];
-	}
+	
+	};
 
 	// edit form 
 	function save() {
@@ -286,7 +290,7 @@ $(document).ready(function () {
 		autoOpen: false, modal: true,
 		buttons: {
 			Save: save,
-			Cancel: function () { dialog.dialog("close"); }
+			Cancel: function () { dialog.mode = ""; dialog.dialog("close"); }
 		}
 	});
 
