@@ -44,3 +44,8 @@ input[type="button"]{
     width: 16%;		/* this number shows each buttons width-size in % (100% is the full width of the display) */
     min-width: 125px;
 }
+
+/* Hide the X in the top-right of the dialog box. */
+.ui-dialog-titlebar-close {
+    display: none;
+}
