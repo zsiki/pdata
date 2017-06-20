@@ -17,14 +17,19 @@ $(document).ready(function () {
 			}
 		}).done(
 			function (data) {
-				$("#dbtable").html(data);
+				// Parse the JSON data returned.
+				var refrData = JSON.parse(data);
+
+				$("#dbtable").html(refrData.html);
 				if (dialog.mode == "filt") {
-					alert("Database filtered!")
+					alert("Database filtered. " + refrData.rowcount + " row(s) returned.")
+					dialog.mode = "";
 				} else {
 					alert("Database refreshed!");					
 				};
 			});
 	});
+
 	// delete marked records
 	$("#del").click(function () {
 		var s = "";
