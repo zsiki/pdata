@@ -59,7 +59,10 @@ def index(req, table="pdata", order="id"):
                <input type="button" name="filt" value="Filter" id="filt">&nbsp;
             </p><div id="dbtable">
         """.format(config.path, config.js, config.css)
-    return res + dbtable(req, table, order) + "</div></body></html>"
+
+    res += json.loads(dbtable(req, table, order))["html"]
+
+    return res + "</div></body></html>"
 
 def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', elevFilt='', 
             d1Filt = '', d2Filt = ''):
@@ -74,7 +77,7 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
         :param elevFilt: filter for the elevations
         :param d1Filt: first part (year-month-day) of the date filter
         :param d2Filt: second part (hour-minute_second) of the date filter 
-        :returns: html string
+        :returns: html string and number of rows returned from database
     """
     logging.basicConfig(format=config.log_format, filename=config.log)
     conn = psycopg2.connect(database=config.database)
@@ -127,6 +130,9 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
     cur.execute(sql)
     # hibakezeles!!!!
 
+    # Number of rows returned
+    rowcount = cur.rowcount
+
     res = """
              <table border="1">
              <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Elevation</th><th>Time</th></tr>
@@ -139,7 +145,7 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
                <td>{4}</td></tr>""".format(row[0], row[1], row[2], row[3], row[4])
     res += "</table>"
     cur.close()
-    return res
+    return json.dumps({"html": res, "rowcount": rowcount})
 
 def dbdel(req, table, ids):
     """ Delete records from table, ids contains point id and date/time in the
@@ -165,7 +171,7 @@ def dbdel(req, table, ids):
     logging.debug(sql)
     cur = conn.cursor()
     cur.execute(sql)
-    msg = "{0} lines deleted".format(cur.rowcount)
+    msg = "{0} line(s) deleted".format(cur.rowcount)
     logging.info(msg)
     conn.commit()
     cur.close()
