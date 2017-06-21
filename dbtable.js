@@ -70,9 +70,15 @@ $(document).ready(function () {
 	var d1F = "";
 	var d2F = "";
 
-	function updateDialogFill() {
+	function dialogFill() {
 		// Reset the dialog box text.
 		$("#filtMessage").html("");
+
+		// Reset the dialog box fields except if filter is selected.
+		if (dialog.mode != "filt") {
+			$("#diaFields")[0].reset();
+		};
+
 
 		// Selected checkboxes.
 		s = $(":input:checkbox:checked");
@@ -92,12 +98,9 @@ $(document).ready(function () {
 								   "<p style='margin-top:0;margin-bottom:8px'>Valid operators for the easting, northing, elevation, date and hour filtering: " +
 								   "<, >, =, <=, >=, and, or, between x and y.</p>" +
 								   "<p style='margin-top:0'>Example: < 2017-02-02 and >= 2017-01-03</p>")
+		};
 
-		} else if (s.length > 1) {
-			alert("Too many rows selected")
-			dialog.dialog("close");
-
-		} else {
+		if (dialog.mode == "upd") {
 			var s = $(":input:checkbox:checked");
 			if (s.length == 1) {
 				var w = s[0].name;	// point id and date time
@@ -129,7 +132,8 @@ $(document).ready(function () {
 				alert("Select a row!")
 				dialog.dialog("close");
 			}
-		}
+		};
+
 		return[selectedDate, selectedId, selectedTime];
 	
 	};
@@ -294,7 +298,7 @@ $(document).ready(function () {
 		}
 	});
 
-	$("#dia").dialog({ open: updateDialogFill });
+	$("#dia").dialog({ open: dialogFill });
 
 	$("#ins").click(function () {
 		dialog.mode = "ins";
