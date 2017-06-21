@@ -33,7 +33,7 @@ def index(req, table="pdata", order="id"):
         <body>
             <div id="dia" title="Hello">
                 <div id="filtMessage"></div>
-                <form id=diaFields>
+                <form id="diaFields">
                     <fieldset>
                     <label for="id">Point ID</label><br />
                     <input type="text" name="id" id="id" size="15"><br />
