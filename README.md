@@ -4,39 +4,39 @@ point data handler application
 The aim of this project to create a simple application to handle point data 
 (id, coordiates, date and time) in a relational database from the browser.
 
-##Functions
+## Functions
 
-+Refresh
-+Update
-+Delete
-+Insert
-+Select
-+Filter
++ Refresh
++ Update
++ Delete
++ Insert
++ Select
++ Filter
 
-###Refresh
+### Refresh
 
 Sincronice content to the database.
 
-###Update
+### Update
 
 Update a single record, a record have to be marked before.
 
-###Delete
+### Delete
 
 Delete all marked rows from database and refresh.
 
-###Insert
+### Insert
 
 Insert a new record into the database and refresh.
 
-###Select
+### Select
 
 Mark rows by complex condition, useful to use together delete.
 
-###Filter
+### Filter
 
 Show only rows which pass the complex filter
 
-##How to set up filter
+## How to set up filter
 
 TO BE DONE
