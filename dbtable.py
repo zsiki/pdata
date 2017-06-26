@@ -57,7 +57,11 @@ def index(req, table="pdata", order="id"):
                <input type="button" name="ins" value="Insert" id="ins">&nbsp;
 	           <input type="button" name="sel" value="Select" id="sel">&nbsp;
                <input type="button" name="filt" value="Filter" id="filt">&nbsp;
-            </p><div id="dbtable">
+            </p>
+	    <table border="1">
+            <tr><th><input type="checkbox" name="checkAll"></th><th>ID</th><th>Easting</th><th>Northing</th><th>Elevation</th><th>Time</th></tr>
+	    <tbody id="dbtableCont">          
+
         """.format(config.path, config.js, config.css)
 
     res += json.loads(dbtable(req, table, order))["html"]
@@ -65,7 +69,7 @@ def index(req, table="pdata", order="id"):
     return res + "</div></body></html>"
 
 def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', elevFilt='', 
-            d1Filt = '', d2Filt = ''):
+            d1Filt = '', d2Filt = '', sel=0):
     """ returns html table of point data from database
 
         :param req: request data (not used)
@@ -77,7 +81,9 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
         :param elevFilt: filter for the elevations
         :param d1Filt: first part (year-month-day) of the date filter
         :param d2Filt: second part (hour-minute_second) of the date filter 
-        :returns: html string and number of rows returned from database
+	:param sel: if the value is 1 -> selecting is active, if the value is 0 -> filterint is active
+        :returns if sel=0 (filtering) JSON object containing an html string and number of rows returned from database,
+		if sel=1 (selecting) JSON object containing the names of selected rows
     """
     logging.basicConfig(format=config.log_format, filename=config.log)
     conn = psycopg2.connect(database=config.database)
@@ -133,17 +139,24 @@ def dbtable(req, table, order="id", idFilt='', eastingFilt='', northingFilt='', 
     # Number of rows returned
     rowcount = cur.rowcount
 
-    res = """
-             <table border="1">
-             <tr><th>&nbsp;</th><th>ID</th><th>Easting</th><th>Northing</th><th>Elevation</th><th>Time</th></tr>
-        """
+    # If selection mode is active
+    if sel:
+        # List of selected rows
+        selList = []	
+	for row in cur:
+            selList.append("{0}|{1}".format(row[0],row[4]))
+	
+	return json.dumps(selList)
+
+
+    res = ""
     for row in cur:
         res += """<tr><td><input type="checkbox" name="{0}|{4}"></td>
                <td>{0}</td><td>{1}</td>
                <td>{2}</td>
                <td>{3}</td>
                <td>{4}</td></tr>""".format(row[0], row[1], row[2], row[3], row[4])
-    res += "</table>"
+    res += "</tbody></table>"
     cur.close()
     return json.dumps({"html": res, "rowcount": rowcount})
 
