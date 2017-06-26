@@ -27,8 +27,14 @@ $(document).ready(function () {
 				} else {
 					alert("Database refreshed!");					
 				};
-			});	
-
+			});
+		
+		//Change the color of the filter button if the database is filtered.
+		if (idF + eastingF + northingF + elevF + d1F + d2F == "") {
+			$("#filt").css('background-color', '#117864');
+		} else {
+			$("#filt").css('background-color', 'red');
+		};
 	});
 
 	// check all checkboxes with the checkbox in the header
