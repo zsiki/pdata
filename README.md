@@ -19,7 +19,7 @@ Synchronize content with the database.
 
 ### Update
 
-Update a single selected record.
+Update a single selected record and refresh.
 
 ### Delete
 
@@ -32,12 +32,20 @@ Insert a new record into the database and refresh.
 ### Select
 
 Mark rows by complex condition, useful to use together with delete.
+With the checkbox in the header you can chech/uncheck all rows with one click.
+If you want to deselect the selected rows, delete the options from the dialog box.
+If you have selected rows, and you want to do a new selection, the old selection will be deleted, and the result will be only the new selection. But in the dialog box you can use more selecting options in one step (for example you can select by id and date).
+Selection can be used for filtered datas too.
+
+**Selecting options**
+
+Selecting options work in the same way as filtering (see below).
 
 ### Filter
 
 Show only rows which pass the complex filter.
 
-## Filtering options
+**Filtering options**
 
 + The point id's are stored as strings in the database, so any valid RegEx matching criterion can be used for filtering. E. g. `^1.*$` or `^1.*` will only show rows where the id's begin with one (1, 11, 12, 132, 123A, ...).
 
