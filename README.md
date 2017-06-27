@@ -2,7 +2,7 @@
 point data handler application
 
 The aim of this project to create a simple application to handle point data 
-(id, coordiates, date and time) in a relational database from a browser.
+(id, coordinates, date and time) in a relational database from a browser.
 
 ## Functions
 
