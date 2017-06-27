@@ -203,30 +203,30 @@ $(document).ready(function () {
 
 			// Validate the field values.
 			// Easting, Northing and Elevation validation:
-			if (coordValid(eastingS) == 0) {
-				alert("Easting select invalid!");
+			if (coordValid(eastingF) == 0) {
+				alert("Easting filter invalid!");
 				return;
 			};
 
-			if (coordValid(northingS) == 0) {
-				alert("Northing select invalid!");
+			if (coordValid(northingF) == 0) {
+				alert("Northing filter invalid!");
 				return;
 			};
 
-			if (coordValid(elevS) == 0) {
-				alert("Elevation select invalid!");
+			if (coordValid(elevF) == 0) {
+				alert("Elevation filter invalid!");
 				return;
 			};
 
 			// D1 validation (year-month-day):
-			if (dateValid(d1S) == 0) {
-				alert("Date select invalid!")
+			if (dateValid(d1F) == 0) {
+				alert("Date filter invalid!")
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
-			if (hmsValid(d2S) == 0) {
-				alert("Hour:Minute:Second select invalid!");
+			if (hmsValid(d2F) == 0) {
+				alert("Hour:Minute:Second filter invalid!");
 				return;
 			};
 
@@ -251,29 +251,29 @@ $(document).ready(function () {
 		// Validate the field values.
 			// Easting, Northing and Elevation validation:
 			if (coordValid(eastingS) == 0) {
-				alert("Easting filter invalid!");
+				alert("Easting select invalid!");
 				return;
 			};
 
 			if (coordValid(northingS) == 0) {
-				alert("Northing filter invalid!");
+				alert("Northing select invalid!");
 				return;
 			};
 
 			if (coordValid(elevS) == 0) {
-				alert("Elevation filter invalid!");
+				alert("Elevation select invalid!");
 				return;
 			};
 
 			// D1 validation (year-month-day):
 			if (dateValid(d1S) == 0) {
-				alert("Date filter invalid!")
+				alert("Date select invalid!")
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2S) == 0) {
-				alert("Hour:Minute:Second filter invalid!");
+				alert("Hour:Minute:Second select invalid!");
 				return;
 			};
 
@@ -305,6 +305,8 @@ $(document).ready(function () {
 				selData.forEach( function(val) {
 					$("input:checkbox[name='" + val + "']")[0].checked = true;			
 				})
+				alert("Selection is done!")
+				dialog.dialog("close");
 			})
 		};
 
