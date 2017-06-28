@@ -234,7 +234,11 @@ $(document).ready(function () {
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2F) == 0) {
+<<<<<<< HEAD
 				alert("Time filter invalid!");
+=======
+				alert("Hour:Minute:Second filter invalid!");
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
@@ -259,29 +263,49 @@ $(document).ready(function () {
 		// Validate the field values.
 			// Easting, Northing and Elevation validation:
 			if (coordValid(eastingS) == 0) {
+<<<<<<< HEAD
 				alert("Easting selection invalid!");
+=======
+				alert("Easting select invalid!");
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			if (coordValid(northingS) == 0) {
+<<<<<<< HEAD
 				alert("Northing selection invalid!");
+=======
+				alert("Northing select invalid!");
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			if (coordValid(elevS) == 0) {
+<<<<<<< HEAD
 				alert("Elevation selection invalid!");
+=======
+				alert("Elevation select invalid!");
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			// D1 validation (year-month-day):
 			if (dateValid(d1S) == 0) {
+<<<<<<< HEAD
 				alert("Date selection invalid!")
+=======
+				alert("Date select invalid!")
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2S) == 0) {
+<<<<<<< HEAD
 				alert("Time selection invalid!");
+=======
+				alert("Hour:Minute:Second select invalid!");
+>>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
@@ -313,6 +337,8 @@ $(document).ready(function () {
 				selData.forEach( function(val) {
 					$("input:checkbox[name='" + val + "']")[0].checked = true;			
 				})
+				alert("Selection is done!")
+				dialog.dialog("close");
 			})
 		};
 
