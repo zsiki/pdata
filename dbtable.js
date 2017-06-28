@@ -234,11 +234,7 @@ $(document).ready(function () {
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2F) == 0) {
-<<<<<<< HEAD
 				alert("Time filter invalid!");
-=======
-				alert("Hour:Minute:Second filter invalid!");
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
@@ -263,49 +259,29 @@ $(document).ready(function () {
 		// Validate the field values.
 			// Easting, Northing and Elevation validation:
 			if (coordValid(eastingS) == 0) {
-<<<<<<< HEAD
-				alert("Easting selection invalid!");
-=======
 				alert("Easting select invalid!");
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			if (coordValid(northingS) == 0) {
-<<<<<<< HEAD
-				alert("Northing selection invalid!");
-=======
 				alert("Northing select invalid!");
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			if (coordValid(elevS) == 0) {
-<<<<<<< HEAD
-				alert("Elevation selection invalid!");
-=======
 				alert("Elevation select invalid!");
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			// D1 validation (year-month-day):
 			if (dateValid(d1S) == 0) {
-<<<<<<< HEAD
-				alert("Date selection invalid!")
-=======
 				alert("Date select invalid!")
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2S) == 0) {
-<<<<<<< HEAD
-				alert("Time selection invalid!");
-=======
-				alert("Hour:Minute:Second select invalid!");
->>>>>>> bd6fd26814ca22a3cfca380b5b1b9188b89cd45f
+				alert("Time select invalid!");
 				return;
 			};
 
@@ -434,8 +410,8 @@ $(document).ready(function () {
 
 	// Validity checker for the coordinate fields in the filter/select dialog.
 	function coordValid(coord) {
-		var matches = /^(<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
-				  /^(<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))\ (and|or)\ (<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
+		var matches = /^(<|>|=|<=|>=|<>|!=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
+				  /^(<|>|=|<=|>=|<>|!=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))\ (and|or)\ (<|>|=|<=|>=|<>|!=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
 				  /^between\ ?\-?((\d+\.?\d*)|(\.\d+))\ (and)\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
 				  /^$/.test(coord);
 
@@ -448,8 +424,8 @@ $(document).ready(function () {
 
 	// Validity checker for the date field in the filter/select dialog.
 	function dateValid(d1) {
-		var matches = /^(<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
-				  /^(<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
+		var matches = /^(<|>|=|<=|>=|<>|!=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
+				  /^(<|>|=|<=|>=|<>|!=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])\ (and|or)\ (<|>|=|<=|>=|<>|!=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
 				  /^between\ \d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])\ and\ \d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
 				  /^$/.test(d1);
 	
@@ -462,8 +438,8 @@ $(document).ready(function () {
 
 	// Validity checker for the time field in the filter/select dialog.
 	function hmsValid(d2) {
-		var matches = /^(<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
-				  /^(<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])\ (and|or)\ (<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
+		var matches = /^(<|>|=|<=|>=|<>|!=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
+				  /^(<|>|=|<=|>=|<>|!=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])\ (and|or)\ (<|>|=|<=|>=|<>|!=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
 				  /^between\ (((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])\ and\ (((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
 				  /^$/.test(d2);
 
