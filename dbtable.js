@@ -74,8 +74,7 @@ $(document).ready(function () {
 
 	//datepicker
 	$(function () {
-		$("#d1").datepicker({ dateFormat: 'yy-mm-dd',
-							  constrainInput: false });
+		$("#d1").datepicker({ dateFormat: 'yy-mm-dd' });
 	});
 
 	var selectedId;
@@ -99,6 +98,9 @@ $(document).ready(function () {
 	var d2S = "";
 	
 	function dialogFill() {
+		// By default iput is not allowed for the datepicker.
+		$("#d1").datepicker('option', 'constrainInput', true);
+
 		// Selected checkboxes.
 		s = $(":input:checkbox:checked");
 		
@@ -113,6 +115,9 @@ $(document).ready(function () {
 
 		// Filter mode for dialog box.
 		if (dialog.mode == "filt") {
+			// Allow user input for the date.
+			$("#d1").datepicker('option', 'constrainInput', false);
+
 			// Getting the previous filter entries.
 			$("#id").val(idF);
 			$("#easting").val(eastingF);
@@ -130,6 +135,9 @@ $(document).ready(function () {
 		
 		// Select mode for dialog box.
 		if (dialog.mode == "sel") {
+			// Allow user input for the date.
+			$("#d1").datepicker('option', 'constrainInput', false);
+
 			// Checking if any checkboxes are thicked and alert the user
 			if (s.length >= 1){
 				alert("You have already selected row(s)! Clicking 'Save' will delete the current selection!")
@@ -203,30 +211,30 @@ $(document).ready(function () {
 
 			// Validate the field values.
 			// Easting, Northing and Elevation validation:
-			if (coordValid(eastingS) == 0) {
-				alert("Easting select invalid!");
+			if (coordValid(eastingF) == 0) {
+				alert("Easting filter invalid!");
 				return;
 			};
 
-			if (coordValid(northingS) == 0) {
-				alert("Northing select invalid!");
+			if (coordValid(northingF) == 0) {
+				alert("Northing filter invalid!");
 				return;
 			};
 
-			if (coordValid(elevS) == 0) {
-				alert("Elevation select invalid!");
+			if (coordValid(elevF) == 0) {
+				alert("Elevation filter invalid!");
 				return;
 			};
 
 			// D1 validation (year-month-day):
-			if (dateValid(d1S) == 0) {
-				alert("Date select invalid!")
+			if (dateValid(d1F) == 0) {
+				alert("Date filter invalid!")
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
-			if (hmsValid(d2S) == 0) {
-				alert("Hour:Minute:Second select invalid!");
+			if (hmsValid(d2F) == 0) {
+				alert("Time filter invalid!");
 				return;
 			};
 
@@ -251,29 +259,29 @@ $(document).ready(function () {
 		// Validate the field values.
 			// Easting, Northing and Elevation validation:
 			if (coordValid(eastingS) == 0) {
-				alert("Easting filter invalid!");
+				alert("Easting selection invalid!");
 				return;
 			};
 
 			if (coordValid(northingS) == 0) {
-				alert("Northing filter invalid!");
+				alert("Northing selection invalid!");
 				return;
 			};
 
 			if (coordValid(elevS) == 0) {
-				alert("Elevation filter invalid!");
+				alert("Elevation selection invalid!");
 				return;
 			};
 
 			// D1 validation (year-month-day):
 			if (dateValid(d1S) == 0) {
-				alert("Date filter invalid!")
+				alert("Date selection invalid!")
 				return;
 			};
 
 			//D2 validation (hour-minute-second):
 			if (hmsValid(d2S) == 0) {
-				alert("Hour:Minute:Second filter invalid!");
+				alert("Time selection invalid!");
 				return;
 			};
 
@@ -309,7 +317,7 @@ $(document).ready(function () {
 		};
 
 
-		// check fields
+		// Insert and update
 		var loc = { table: "pdata" };
 		var fields = ["id", "easting", "northing"];
 		var opts = ["elev", "d1", "d2"];
@@ -334,16 +342,41 @@ $(document).ready(function () {
 					loc[opts[i]] = w;
 				}
 			}
-			// check timeformat
-			if (dialog.mode == "ins") {
-				var value = w
-				var matches = value.match(/([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]/)
-				if (matches == null) {
-					alert("Invalid time format!");
-					return;
-				}
-			}
 
+			// Validate fields
+			var coordRegex = /^\-?((\d+\.?\d*)|(\.\d+))$/;
+			var dateRegex = /^\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/;
+			var hmsRegex = /^(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/;
+
+			// Easting
+			if (coordRegex.test($("#easting").val()) == 0) {
+				alert("Invalid easting value!");
+				return;
+			};
+
+			// Northing
+			if (coordRegex.test($("#northing").val()) == 0) {
+				alert("Invalid northing value!");
+				return;
+			};
+
+			// Elevation
+			if (coordRegex.test($("#elev").val()) == 0) {
+				alert("Invalid elevation value!");
+				return;
+			};
+
+			// Date
+			if (dateRegex.test($("#d1").val()) == 0) {
+				alert("Invalid date value!");
+				return;
+			};
+
+			// Time
+			if (hmsRegex.test($("#d2").val()) == 0) {
+				alert("Invalid time value!");
+				return;
+			};
 
 			loc["d"] = loc["d1"] + " " + loc["d2"]
 			//del loc["d1"]
@@ -356,7 +389,8 @@ $(document).ready(function () {
 						alert(data);
 						$("#ref").trigger("click");
 					});
-			}
+			};
+		};
 
 			if (dialog.mode == "upd") {
 				$.ajax({
@@ -369,16 +403,14 @@ $(document).ready(function () {
 					});
 			};
 
-		};
-
 		dialog.dialog("close");
 	};
 
-	// Validity checker for the coordinate fields.
+	// Validity checker for the coordinate fields in the filter/select dialog.
 	function coordValid(coord) {
-		matches = /^(<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)$/.test(coord) +
-				  /^(<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)\ (and|or)\ (<|>|>=|<=|=)\ ?(\-?\d+\.?\d*|\.\d+)$/.test(coord) +
-				  /^between\ (\-?\d+\.?\d*|\.\d+)\ and\ (\-?\d+\.?\d*|\.\d+)$/.test(coord) +
+		var matches = /^(<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
+				  /^(<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))\ (and|or)\ (<|>|=|<=|>=){1}\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
+				  /^between\ ?\-?((\d+\.?\d*)|(\.\d+))\ (and)\ ?\-?((\d+\.?\d*)|(\.\d+))$/.test(coord) +
 				  /^$/.test(coord);
 
 		if (matches == 0) {
@@ -388,11 +420,11 @@ $(document).ready(function () {
 		};
 	};
 
-	// Validity checker for the date field.
+	// Validity checker for the date field in the filter/select dialog.
 	function dateValid(d1) {
-		matches = /^(<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}$/.test(d1) +
-				  /^(<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{4}\-\d{2}\-\d{2}$/.test(d1) +
-				  /^between\ \d{4}\-\d{2}\-\d{2}\ and\ \d{4}\-\d{2}\-\d{2}$/.test(d1) +
+		var matches = /^(<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
+				  /^(<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
+				  /^between\ \d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])\ and\ \d{4}\-(0[1-9]|1[0-2])\-(0[1-9]|(1|2)[0-9]|3[0-1])$/.test(d1) +
 				  /^$/.test(d1);
 	
 		if (matches == 0) {
@@ -402,11 +434,11 @@ $(document).ready(function () {
 		};
 	};
 
-	// Validity checker for the time field.
+	// Validity checker for the time field in the filter/select dialog.
 	function hmsValid(d2) {
-		matches = /^(<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}$/.test(d2) +
-				  /^(<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}\ (and|or)\ (<|>|=|<=|>=){1}\ ?\d{2}\:\d{2}\:\d{2}$/.test(d2) +
-				  /^between\ \d{2}\:\d{2}\:\d{2}\ and\ \d{2}\:\d{2}\:\d{2}$/.test(d2) +
+		var matches = /^(<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
+				  /^(<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])\ (and|or)\ (<|>|=|<=|>=){1}\ ?(((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
+				  /^between\ (((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])\ and\ (((0|1)[0-9])|2[0-3])\:([0-5][0-9])\:([0-5][0-9])$/.test(d2) +
 				  /^$/.test(d2);
 
 		if (matches == 0) {
