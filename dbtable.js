@@ -98,7 +98,7 @@ $(document).ready(function () {
 	var d2S = "";
 	
 	function dialogFill() {
-		// By default iput is not allowed for the datepicker.
+		// By default input is not allowed for the datepicker.
 		$("#d1").datepicker('option', 'constrainInput', true);
 
 		// Selected checkboxes.
